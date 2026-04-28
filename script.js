@@ -15,8 +15,11 @@ let t = 0;
 let running = true;
 let points = [];
 
-// Animation scale (important fix)
-const scale = 3;
+// Animation scale 
+let range = (v0 * v0 * Math.sin(2 * theta)) / g;
+let scale = canvas.width / (range * 1.1);
+let canvasX = px * scale;
+let canvasY = canvas.height - py * scale;
 
 // Velocity components
 let vx, vy;
