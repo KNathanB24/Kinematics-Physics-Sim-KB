@@ -1,44 +1,44 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// Physics
-let v0 = 80;        // increased so motion is visible
+// Physics parameters
+let v0 = 80;
 let angle = 45;
 let g = 9.8;
 let h = 0;
 
-// Convert angle
-let theta = angle * Math.PI / 180;
-
-// State
+// Time + state
 let t = 0;
 let running = true;
 let points = [];
 
-// Animation scale 
-let range = (v0 * v0 * Math.sin(2 * theta)) / g;
-let scale = canvas.width / (range * 1.1);
-let canvasX = px * scale;
-let canvasY = canvas.height - py * scale;
-
 // Velocity components
 let vx, vy;
+let theta;
+
+// Scale (computed per simulation)
+let scale;
 
 function reset() {
     t = 0;
     points = [];
+    running = true;
 
+    // Convert angle
     theta = angle * Math.PI / 180;
+
+    // Velocity components
     vx = v0 * Math.cos(theta);
     vy = v0 * Math.sin(theta);
 
-    running = true;
+    // Estimate range and compute scale (IMPORTANT FIX)
+    let range = (v0 * v0 * Math.sin(2 * theta)) / g;
+    scale = canvas.width / (range * 1.1);
 }
 
 function step() {
     if (!running) return;
 
-    // time based on frame rate (important fix)
     t += 0.05;
 
     let x = vx * t;
@@ -46,6 +46,7 @@ function step() {
 
     if (y < 0) {
         running = false;
+        draw();
         return;
     }
 
@@ -58,13 +59,13 @@ function step() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // ground
+    // Ground line
     ctx.beginPath();
     ctx.moveTo(0, canvas.height);
     ctx.lineTo(canvas.width, canvas.height);
     ctx.stroke();
 
-    // path
+    // Trajectory
     ctx.beginPath();
 
     for (let i = 0; i < points.length; i++) {
@@ -77,7 +78,7 @@ function draw() {
 
     ctx.stroke();
 
-    // projectile
+    // Projectile (moving dot)
     if (points.length > 0) {
         let last = points[points.length - 1];
 
@@ -93,6 +94,6 @@ function draw() {
     }
 }
 
-// start
+// Start simulation
 reset();
 step();
