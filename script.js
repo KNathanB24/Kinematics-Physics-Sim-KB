@@ -24,6 +24,9 @@ window.onload = function () {
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            ctx.fillStyle = "red";
+            ctx.fillRect(10, 10, 50, 50);
+
         ctx.beginPath();
 
         for (let i = 0; i < points.length; i++) {
