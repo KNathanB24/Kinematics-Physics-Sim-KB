@@ -24,16 +24,13 @@ window.onload = function () {
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = "red";
-            ctx.fillRect(10, 10, 50, 50);
-
         ctx.beginPath();
 
         for (let i = 0; i < points.length; i++) {
             let px = points[i].x;
             let py = points[i].y;
 
-            let scale = 5;
+            let scale = canvas.width / 100;
             let canvasX = px * scale;
             let canvasY = canvas.height - (py * scale);
 
