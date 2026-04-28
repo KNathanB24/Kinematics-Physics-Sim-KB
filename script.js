@@ -25,3 +25,29 @@ for (let t = 0; t < 10; t += dt) {
 
     points.push({ x, y });
 }
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.beginPath();
+
+    for (let i = 0; i < points.length; i++) {
+        let px = points[i].x;
+        let py = points[i].y;
+
+        // Scale + flip y-axis
+        let scale = 5;
+        let canvasX = px * scale;
+        let canvasY = canvas.height - (py * scale);
+
+        if (i === 0) {
+            ctx.moveTo(canvasX, canvasY);
+        } else {
+            ctx.lineTo(canvasX, canvasY);
+        }
+    }
+
+    ctx.stroke();
+}
+
+draw();
