@@ -25,6 +25,11 @@ window.onload = function () {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         ctx.beginPath();
+        ctx.moveTo(0, canvas.height);
+        ctx.lineTo(canvas.width, canvas.height);
+        ctx.stroke();
+
+        ctx.beginPath();
 
         for (let i = 0; i < points.length; i++) {
             let px = points[i].x;
