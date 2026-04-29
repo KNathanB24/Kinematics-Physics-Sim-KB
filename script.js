@@ -18,6 +18,9 @@ const timeEl = document.getElementById("time");
 const heightEl = document.getElementById("height");
 const rangeEl = document.getElementById("range");
 
+const xPosEl = document.getElementById("xPos");
+const yPosEl = document.getElementById("yPos");
+
 // ---------------- PHYSICS ----------------
 let v0 = 80;
 let angle = 45;
@@ -32,6 +35,7 @@ let points = [];
 let maxHeight = 0;
 let finalRange = 0;
 
+// velocity
 let vx, vy, theta;
 
 // ---------------- AUTO SCALE ----------------
@@ -66,7 +70,7 @@ function reset() {
     scale = 1;
 
     draw();
-    updateUI();
+    updateUI(0, 0);
 }
 
 // ---------------- LOOP ----------------
@@ -78,6 +82,7 @@ function step() {
     let x = vx * t;
     let y = h + vy * t - 0.5 * g * t * t;
 
+    // track bounds
     if (x > maxX) maxX = x;
     if (y > maxY) maxY = y;
 
@@ -92,7 +97,7 @@ function step() {
     if (y < 0) {
         running = false;
         finalRange = x;
-        updateUI();
+        updateUI(x, 0);
         draw();
         return;
     }
@@ -101,17 +106,20 @@ function step() {
 
     points.push({ x, y });
 
-    updateUI();
+    updateUI(x, y);
     draw();
 
     requestAnimationFrame(step);
 }
 
-// ---------------- UI ----------------
-function updateUI() {
+// ---------------- UI UPDATE ----------------
+function updateUI(currentX = 0, currentY = 0) {
     if (timeEl) timeEl.textContent = t.toFixed(2);
     if (heightEl) heightEl.textContent = maxHeight.toFixed(2);
     if (rangeEl) rangeEl.textContent = finalRange.toFixed(2);
+
+    if (xPosEl) xPosEl.textContent = currentX.toFixed(2);
+    if (yPosEl) yPosEl.textContent = Math.max(0, currentY).toFixed(2);
 
     v0Label.textContent = v0 + " m/s";
     angleLabel.textContent = angle + " °";
@@ -225,6 +233,8 @@ function draw() {
     drawAxes();
 
     ctx.strokeStyle = "blue";
+    ctx.lineWidth = 2;
+
     ctx.beginPath();
 
     for (let i = 0; i < points.length; i++) {
@@ -268,11 +278,12 @@ gSlider.addEventListener("input", () => {
     reset();
 });
 
-function setGravityPreset(value) {
+// gravity preset helper (must exist in HTML buttons)
+window.setGravityPreset = function(value) {
     g = value;
-    gSlider.value = value; // sync slider
+    gSlider.value = value;
     reset();
-}
+};
 
 startBtn.onclick = () => {
     if (!running) {
