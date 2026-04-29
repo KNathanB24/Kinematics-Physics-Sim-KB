@@ -1,45 +1,39 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// Physics parameters
+// Physics
 let v0 = 80;
 let angle = 45;
 let g = 9.8;
 let h = 0;
 
-// Time + state
+// Time/state
 let t = 0;
 let running = true;
 let points = [];
 
-// Velocity components
-let vx, vy;
-let theta;
+// Velocity
+let vx, vy, theta;
 
-// Scale (computed per simulation)
+// Scale (set in reset)
 let scale;
 
+// ---------- RESET ----------
 function reset() {
     t = 0;
     points = [];
     running = true;
 
-    // Convert angle
     theta = angle * Math.PI / 180;
 
-    // Velocity components
     vx = v0 * Math.cos(theta);
     vy = v0 * Math.sin(theta);
 
-    // Estimate range and compute scale (IMPORTANT FIX)
     let range = (v0 * v0 * Math.sin(2 * theta)) / g;
-
-    // prevent divide-by-zero or tiny angles
-    if (range < 1) range = 1;
-
     scale = canvas.width / (range * 1.2);
 }
 
+// ---------- UPDATE ----------
 function step() {
     if (!running) return;
 
@@ -60,16 +54,66 @@ function step() {
     requestAnimationFrame(step);
 }
 
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+// ---------- DRAW GRID ----------
+function drawGrid() {
+    ctx.strokeStyle = "#e6e6e6";
+    ctx.lineWidth = 1;
 
-    // Ground line
+    let step = 40;
+
+    // vertical lines
+    for (let x = 0; x < canvas.width; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+    }
+
+    // horizontal lines
+    for (let y = 0; y < canvas.height; y += step) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+    }
+}
+
+// ---------- DRAW AXES ----------
+function drawAxes() {
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+
+    // x-axis (ground)
     ctx.beginPath();
     ctx.moveTo(0, canvas.height);
     ctx.lineTo(canvas.width, canvas.height);
     ctx.stroke();
 
-    // Trajectory
+    // y-axis
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height);
+    ctx.lineTo(0, 0);
+    ctx.stroke();
+
+    // labels
+    ctx.fillStyle = "black";
+    ctx.font = "14px Arial";
+
+    ctx.fillText("x (distance)", canvas.width - 100, canvas.height - 10);
+    ctx.fillText("y (height)", 10, 20);
+}
+
+// ---------- DRAW SIMULATION ----------
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawGrid();
+    drawAxes();
+
+    // trajectory
+    ctx.strokeStyle = "blue";
+    ctx.lineWidth = 2;
+
     ctx.beginPath();
 
     for (let i = 0; i < points.length; i++) {
@@ -82,22 +126,20 @@ function draw() {
 
     ctx.stroke();
 
-    // Projectile (moving dot)
+    // moving projectile dot (IMPORTANT)
     if (points.length > 0) {
         let last = points[points.length - 1];
 
+        let px = last.x * scale;
+        let py = canvas.height - last.y * scale;
+
+        ctx.fillStyle = "red";
         ctx.beginPath();
-        ctx.arc(
-            last.x * scale,
-            canvas.height - last.y * scale,
-            5,
-            0,
-            Math.PI * 2
-        );
+        ctx.arc(px, py, 6, 0, Math.PI * 2);
         ctx.fill();
     }
 }
 
-// Start simulation
+// ---------- START ----------
 reset();
 step();
