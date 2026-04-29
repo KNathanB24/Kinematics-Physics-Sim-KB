@@ -37,6 +37,19 @@
         <label>Angle: <span id="angleLabel">45</span> °</label><br>
         <input type="range" id="angle" min="5" max="85" value="45"><br><br>
 
+        <label>Gravity: <span id="gLabel">9.8 m/s²</span></label><br>
+        <input type="range" id="gSlider" min="1" max="25" step="0.1" value="9.8"><br><br>
+
+        <!-- Presets -->
+        <div id="gravityControls">
+            <button onclick="setGravityPreset(9.8)">Earth</button>
+            <button onclick="setGravityPreset(1.6)">Moon</button>
+            <button onclick="setGravityPreset(3.7)">Mars</button>
+            <button onclick="setGravityPreset(24.8)">Jupiter</button>
+        </div>
+
+    <br>
+
         <button id="startBtn">Start</button>
         <button id="pauseBtn">Pause</button>
         <button id="resetBtn">Reset</button>
