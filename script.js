@@ -33,7 +33,11 @@ function reset() {
 
     // Estimate range and compute scale (IMPORTANT FIX)
     let range = (v0 * v0 * Math.sin(2 * theta)) / g;
-    scale = canvas.width / (range * 1.1);
+
+    // prevent divide-by-zero or tiny angles
+    if (range < 1) range = 1;
+
+    scale = canvas.width / (range * 1.2);
 }
 
 function step() {
