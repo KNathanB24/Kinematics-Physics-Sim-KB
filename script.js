@@ -1,21 +1,28 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+// UI elements
+const timeDisplay = document.getElementById("time");
+const heightDisplay = document.getElementById("height");
+const rangeDisplay = document.getElementById("range");
+
 // Physics
 let v0 = 80;
 let angle = 45;
 let g = 9.8;
 let h = 0;
 
-// Time/state
+// State
 let t = 0;
 let running = true;
 let points = [];
 
+// Tracking values
+let maxHeight = 0;
+let finalRange = 0;
+
 // Velocity
 let vx, vy, theta;
-
-// Scale (set in reset)
 let scale;
 
 // ---------- RESET ----------
@@ -23,6 +30,9 @@ function reset() {
     t = 0;
     points = [];
     running = true;
+
+    maxHeight = 0;
+    finalRange = 0;
 
     theta = angle * Math.PI / 180;
 
@@ -33,7 +43,7 @@ function reset() {
     scale = canvas.width / (range * 1.2);
 }
 
-// ---------- UPDATE ----------
+// ---------- STEP ----------
 function step() {
     if (!running) return;
 
@@ -44,24 +54,37 @@ function step() {
 
     if (y < 0) {
         running = false;
+        finalRange = x;
+
+        updateUI();
         draw();
         return;
     }
 
+    if (y > maxHeight) maxHeight = y;
+
     points.push({ x, y });
 
+    updateUI();
     draw();
+
     requestAnimationFrame(step);
 }
 
-// ---------- DRAW GRID ----------
+// ---------- UI UPDATE ----------
+function updateUI() {
+    timeDisplay.textContent = t.toFixed(2);
+    heightDisplay.textContent = maxHeight.toFixed(2);
+    rangeDisplay.textContent = finalRange.toFixed(2);
+}
+
+// ---------- GRID ----------
 function drawGrid() {
     ctx.strokeStyle = "#e6e6e6";
     ctx.lineWidth = 1;
 
     let step = 40;
 
-    // vertical lines
     for (let x = 0; x < canvas.width; x += step) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
@@ -69,7 +92,6 @@ function drawGrid() {
         ctx.stroke();
     }
 
-    // horizontal lines
     for (let y = 0; y < canvas.height; y += step) {
         ctx.beginPath();
         ctx.moveTo(0, y);
@@ -78,32 +100,29 @@ function drawGrid() {
     }
 }
 
-// ---------- DRAW AXES ----------
+// ---------- AXES ----------
 function drawAxes() {
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
 
-    // x-axis (ground)
     ctx.beginPath();
     ctx.moveTo(0, canvas.height);
     ctx.lineTo(canvas.width, canvas.height);
     ctx.stroke();
 
-    // y-axis
     ctx.beginPath();
     ctx.moveTo(0, canvas.height);
     ctx.lineTo(0, 0);
     ctx.stroke();
 
-    // labels
     ctx.fillStyle = "black";
     ctx.font = "14px Arial";
 
-    ctx.fillText("x (distance)", canvas.width - 100, canvas.height - 10);
+    ctx.fillText("x (distance)", canvas.width - 110, canvas.height - 10);
     ctx.fillText("y (height)", 10, 20);
 }
 
-// ---------- DRAW SIMULATION ----------
+// ---------- DRAW ----------
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -126,7 +145,7 @@ function draw() {
 
     ctx.stroke();
 
-    // moving projectile dot (IMPORTANT)
+    // projectile dot
     if (points.length > 0) {
         let last = points[points.length - 1];
 
