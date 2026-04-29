@@ -28,8 +28,27 @@
 
     <h1>Projectile Motion Simulator</h1>
 
+<h1>Projectile Motion Simulator</h1>
+
+<!-- CONTROLS -->
+    <div id="controls">
+
+        <label>Velocity: <span id="v0Label">80</span> m/s</label><br>
+        <input type="range" id="v0" min="10" max="150" value="80"><br><br>
+
+        <label>Angle: <span id="angleLabel">45</span> °</label><br>
+        <input type="range" id="angle" min="5" max="85" value="45"><br><br>
+
+        <button id="startBtn">Start</button>
+        <button id="pauseBtn">Pause</button>
+        <button id="resetBtn">Reset</button>
+
+    </div>
+
+    <!-- CANVAS -->
     <canvas id="canvas" width="600" height="400"></canvas>
 
+    <!-- STATS -->
     <div id="stats">
         <p>Time: <span id="time">0</span> s</p>
         <p>Max Height: <span id="height">0</span> m</p>

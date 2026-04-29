@@ -1,34 +1,41 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// Physics
+// ---------------- UI ----------------
+const v0Slider = document.getElementById("v0");
+const angleSlider = document.getElementById("angle");
+
+const v0Label = document.getElementById("v0Label");
+const angleLabel = document.getElementById("angleLabel");
+
+const startBtn = document.getElementById("startBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const resetBtn = document.getElementById("resetBtn");
+
+const timeEl = document.getElementById("time");
+const heightEl = document.getElementById("height");
+const rangeEl = document.getElementById("range");
+
+// ---------------- PHYSICS ----------------
 let v0 = 80;
 let angle = 45;
 let g = 9.8;
 let h = 0;
 
-// State
+// ---------------- STATE ----------------
 let t = 0;
-let running = true;
+let running = false;
 let points = [];
 
-// Tracking
 let maxHeight = 0;
 let finalRange = 0;
 
-// Velocity
+// velocity
 let vx, vy, theta;
 let scale;
 
-// ---------------- RESET ----------------
-function reset() {
-    t = 0;
-    points = [];
-    running = true;
-
-    maxHeight = 0;
-    finalRange = 0;
-
+// ---------------- SETUP PHYSICS ----------------
+function setupPhysics() {
     theta = angle * Math.PI / 180;
 
     vx = v0 * Math.cos(theta);
@@ -38,7 +45,21 @@ function reset() {
     scale = canvas.width / (range * 1.2);
 }
 
-// ---------------- UPDATE ----------------
+// ---------------- RESET ----------------
+function reset() {
+    t = 0;
+    points = [];
+    running = false;
+
+    maxHeight = 0;
+    finalRange = 0;
+
+    setupPhysics();
+    draw();
+    updateUI();
+}
+
+// ---------------- LOOP ----------------
 function step() {
     if (!running) return;
 
@@ -65,17 +86,14 @@ function step() {
     requestAnimationFrame(step);
 }
 
-// ---------------- SAFE UI ----------------
+// ---------------- UI UPDATE ----------------
 function updateUI() {
-    const timeEl = document.getElementById("time");
-    const heightEl = document.getElementById("height");
-    const rangeEl = document.getElementById("range");
+    if (timeEl) timeEl.textContent = t.toFixed(2);
+    if (heightEl) heightEl.textContent = maxHeight.toFixed(2);
+    if (rangeEl) rangeEl.textContent = finalRange.toFixed(2);
 
-    if (!timeEl || !heightEl || !rangeEl) return;
-
-    timeEl.textContent = t.toFixed(2);
-    heightEl.textContent = maxHeight.toFixed(2);
-    rangeEl.textContent = finalRange.toFixed(2);
+    v0Label.textContent = v0 + " m/s";
+    angleLabel.textContent = angle + " °";
 }
 
 // ---------------- GRID ----------------
@@ -120,8 +138,8 @@ function drawAxes() {
     ctx.fillStyle = "black";
     ctx.font = "14px Arial";
 
-    ctx.fillText("x (distance)", canvas.width - 110, canvas.height - 10);
-    ctx.fillText("y (height)", 10, 20);
+    ctx.fillText("x (distance, m)", canvas.width - 140, canvas.height - 10);
+    ctx.fillText("y (height, m)", 10, 20);
 }
 
 // ---------------- DRAW ----------------
@@ -147,7 +165,7 @@ function draw() {
 
     ctx.stroke();
 
-    // moving projectile dot
+    // projectile dot
     if (points.length > 0) {
         let last = points[points.length - 1];
 
@@ -161,6 +179,31 @@ function draw() {
     }
 }
 
+// ---------------- CONTROLS ----------------
+v0Slider.addEventListener("input", () => {
+    v0 = Number(v0Slider.value);
+    reset();
+});
+
+angleSlider.addEventListener("input", () => {
+    angle = Number(angleSlider.value);
+    reset();
+});
+
+startBtn.onclick = () => {
+    if (!running) {
+        running = true;
+        step();
+    }
+};
+
+pauseBtn.onclick = () => {
+    running = false;
+};
+
+resetBtn.onclick = () => {
+    reset();
+};
+
 // ---------------- START ----------------
 reset();
-step();
