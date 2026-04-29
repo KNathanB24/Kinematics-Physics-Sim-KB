@@ -32,7 +32,14 @@ let finalRange = 0;
 
 // velocity
 let vx, vy, theta;
-let scale;
+
+// ---------------- AUTO SCALING ----------------
+let maxX = 0;
+let maxY = 0;
+let scale = 1;
+
+// ---------------- TIME CONTROL ----------------
+let timeScale = 0.4; // 🔥 slows simulation (0.2 slow, 1 fast)
 
 // ---------------- SETUP PHYSICS ----------------
 function setupPhysics() {
@@ -40,9 +47,6 @@ function setupPhysics() {
 
     vx = v0 * Math.cos(theta);
     vy = v0 * Math.sin(theta);
-
-    let range = (v0 * v0 * Math.sin(2 * theta)) / g;
-    scale = canvas.width / (range * 1.2);
 }
 
 // ---------------- RESET ----------------
@@ -54,19 +58,39 @@ function reset() {
     maxHeight = 0;
     finalRange = 0;
 
+    maxX = 0;
+    maxY = 0;
+
     setupPhysics();
+
+    scale = 1;
+
     draw();
     updateUI();
 }
 
-// ---------------- LOOP ----------------
+// ---------------- UPDATE LOOP ----------------
 function step() {
     if (!running) return;
 
-    t += 0.05;
+    // 🐢 slowed time step
+    t += 0.05 * timeScale;
 
     let x = vx * t;
     let y = h + vy * t - 0.5 * g * t * t;
+
+    // track bounds
+    if (x > maxX) maxX = x;
+    if (y > maxY) maxY = y;
+
+    // auto scale so everything fits
+    let worldWidth = Math.max(maxX, 1);
+    let worldHeight = Math.max(maxY, 1);
+
+    let scaleX = canvas.width / (worldWidth * 1.2);
+    let scaleY = canvas.height / (worldHeight * 1.2);
+
+    scale = Math.min(scaleX, scaleY);
 
     if (y < 0) {
         running = false;
@@ -86,7 +110,7 @@ function step() {
     requestAnimationFrame(step);
 }
 
-// ---------------- UI UPDATE ----------------
+// ---------------- UI ----------------
 function updateUI() {
     if (timeEl) timeEl.textContent = t.toFixed(2);
     if (heightEl) heightEl.textContent = maxHeight.toFixed(2);
@@ -99,7 +123,6 @@ function updateUI() {
 // ---------------- GRID ----------------
 function drawGrid() {
     ctx.strokeStyle = "#e6e6e6";
-    ctx.lineWidth = 1;
 
     let step = 40;
 
@@ -123,13 +146,11 @@ function drawAxes() {
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
 
-    // x-axis
     ctx.beginPath();
     ctx.moveTo(0, canvas.height);
     ctx.lineTo(canvas.width, canvas.height);
     ctx.stroke();
 
-    // y-axis
     ctx.beginPath();
     ctx.moveTo(0, canvas.height);
     ctx.lineTo(0, 0);
@@ -138,8 +159,8 @@ function drawAxes() {
     ctx.fillStyle = "black";
     ctx.font = "14px Arial";
 
-    ctx.fillText("x (distance, m)", canvas.width - 140, canvas.height - 10);
-    ctx.fillText("y (height, m)", 10, 20);
+    ctx.fillText("x (m)", canvas.width - 40, canvas.height - 10);
+    ctx.fillText("y (m)", 10, 20);
 }
 
 // ---------------- DRAW ----------------
