@@ -229,7 +229,48 @@ function draw() {
         ctx.beginPath();
         ctx.arc(px, py, 6, 0, Math.PI * 2);
         ctx.fill();
+
+        drawVelocityVector(last.x, last.y);
     }
+}
+
+function drawVelocityVector(x, y) {
+    // velocity components at time t
+    let vx_current = vx;
+    let vy_current = vy - g * t;
+
+    // scale arrow size (adjust if needed)
+    let arrowScale = 0.5;
+
+    let dx = vx_current * arrowScale;
+    let dy = vy_current * arrowScale;
+
+    // convert to canvas coords
+    let startX = x * scale;
+    let startY = canvas.height - y * scale;
+
+    let endX = (x + dx) * scale;
+    let endY = canvas.height - (y + dy) * scale;
+
+    // draw line
+    ctx.strokeStyle = "green";
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(endX, endY);
+    ctx.stroke();
+
+    // arrow head
+    let angle = Math.atan2(endY - startY, endX - startX);
+
+    ctx.beginPath();
+    ctx.moveTo(endX, endY);
+    ctx.lineTo(endX - 8 * Math.cos(angle - 0.3), endY - 8 * Math.sin(angle - 0.3));
+    ctx.lineTo(endX - 8 * Math.cos(angle + 0.3), endY - 8 * Math.sin(angle + 0.3));
+    ctx.closePath();
+    ctx.fillStyle = "green";
+    ctx.fill();
 }
 
 // ---------------- CONTROLS ----------------
