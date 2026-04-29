@@ -4,9 +4,11 @@ const ctx = canvas.getContext("2d");
 // ---------------- UI ----------------
 const v0Slider = document.getElementById("v0");
 const angleSlider = document.getElementById("angle");
+const gSlider = document.getElementById("gSlider");
 
 const v0Label = document.getElementById("v0Label");
 const angleLabel = document.getElementById("angleLabel");
+const gLabel = document.getElementById("gLabel");
 
 const startBtn = document.getElementById("startBtn");
 const pauseBtn = document.getElementById("pauseBtn");
@@ -30,18 +32,17 @@ let points = [];
 let maxHeight = 0;
 let finalRange = 0;
 
-// velocity
 let vx, vy, theta;
 
-// ---------------- AUTO SCALING ----------------
+// ---------------- AUTO SCALE ----------------
 let maxX = 0;
 let maxY = 0;
 let scale = 1;
 
 // ---------------- TIME CONTROL ----------------
-let timeScale = 0.4; // 🔥 slows simulation (0.2 slow, 1 fast)
+let timeScale = 0.4;
 
-// ---------------- SETUP PHYSICS ----------------
+// ---------------- SETUP ----------------
 function setupPhysics() {
     theta = angle * Math.PI / 180;
 
@@ -62,28 +63,24 @@ function reset() {
     maxY = 0;
 
     setupPhysics();
-
     scale = 1;
 
     draw();
     updateUI();
 }
 
-// ---------------- UPDATE LOOP ----------------
+// ---------------- LOOP ----------------
 function step() {
     if (!running) return;
 
-    // 🐢 slowed time step
     t += 0.05 * timeScale;
 
     let x = vx * t;
     let y = h + vy * t - 0.5 * g * t * t;
 
-    // track bounds
     if (x > maxX) maxX = x;
     if (y > maxY) maxY = y;
 
-    // auto scale so everything fits
     let worldWidth = Math.max(maxX, 1);
     let worldHeight = Math.max(maxY, 1);
 
@@ -118,22 +115,21 @@ function updateUI() {
 
     v0Label.textContent = v0 + " m/s";
     angleLabel.textContent = angle + " °";
+    gLabel.textContent = g.toFixed(1) + " m/s²";
 }
 
 // ---------------- GRID ----------------
 function drawGrid() {
     ctx.strokeStyle = "#e6e6e6";
 
-    let step = 40;
-
-    for (let x = 0; x < canvas.width; x += step) {
+    for (let x = 0; x < canvas.width; x += 40) {
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, canvas.height);
         ctx.stroke();
     }
 
-    for (let y = 0; y < canvas.height; y += step) {
+    for (let y = 0; y < canvas.height; y += 40) {
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(canvas.width, y);
@@ -141,18 +137,13 @@ function drawGrid() {
     }
 }
 
-// ---------------- AXES ----------------
+// ---------------- AXES WITH NUMBERS ----------------
 function drawAxes() {
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
     ctx.fillStyle = "black";
     ctx.font = "12px Arial";
 
-    // origin is bottom-left
-    let originX = 0;
-    let originY = canvas.height;
-
-    // axis lines
     ctx.beginPath();
     ctx.moveTo(0, canvas.height);
     ctx.lineTo(canvas.width, canvas.height);
@@ -163,10 +154,8 @@ function drawAxes() {
     ctx.lineTo(0, 0);
     ctx.stroke();
 
-    // spacing in "meters" (based on scale)
     let stepMeters = Math.max(5, Math.round((50 / scale) / 5) * 5);
 
-    // X-axis labels
     for (let x = stepMeters; x < canvas.width / scale; x += stepMeters) {
         let px = x * scale;
 
@@ -178,7 +167,6 @@ function drawAxes() {
         ctx.fillText(x.toFixed(0), px - 10, canvas.height - 10);
     }
 
-    // Y-axis labels
     for (let y = stepMeters; y < canvas.height / scale; y += stepMeters) {
         let py = canvas.height - y * scale;
 
@@ -190,9 +178,43 @@ function drawAxes() {
         ctx.fillText(y.toFixed(0), 5, py + 4);
     }
 
-    // axis titles
     ctx.fillText("x (m)", canvas.width - 40, canvas.height - 10);
     ctx.fillText("y (m)", 10, 15);
+}
+
+// ---------------- VELOCITY VECTOR ----------------
+function drawVelocityVector(x, y) {
+    let vx_current = vx;
+    let vy_current = vy - g * t;
+
+    let arrowScale = 0.5;
+
+    let dx = vx_current * arrowScale;
+    let dy = vy_current * arrowScale;
+
+    let startX = x * scale;
+    let startY = canvas.height - y * scale;
+
+    let endX = (x + dx) * scale;
+    let endY = canvas.height - (y + dy) * scale;
+
+    ctx.strokeStyle = "green";
+    ctx.lineWidth = 2;
+
+    ctx.beginPath();
+    ctx.moveTo(startX, startY);
+    ctx.lineTo(endX, endY);
+    ctx.stroke();
+
+    let angle = Math.atan2(endY - startY, endX - startX);
+
+    ctx.beginPath();
+    ctx.moveTo(endX, endY);
+    ctx.lineTo(endX - 8 * Math.cos(angle - 0.3), endY - 8 * Math.sin(angle - 0.3));
+    ctx.lineTo(endX - 8 * Math.cos(angle + 0.3), endY - 8 * Math.sin(angle + 0.3));
+    ctx.closePath();
+    ctx.fillStyle = "green";
+    ctx.fill();
 }
 
 // ---------------- DRAW ----------------
@@ -202,10 +224,7 @@ function draw() {
     drawGrid();
     drawAxes();
 
-    // trajectory
     ctx.strokeStyle = "blue";
-    ctx.lineWidth = 2;
-
     ctx.beginPath();
 
     for (let i = 0; i < points.length; i++) {
@@ -218,7 +237,6 @@ function draw() {
 
     ctx.stroke();
 
-    // projectile dot
     if (points.length > 0) {
         let last = points[points.length - 1];
 
@@ -234,45 +252,6 @@ function draw() {
     }
 }
 
-function drawVelocityVector(x, y) {
-    // velocity components at time t
-    let vx_current = vx;
-    let vy_current = vy - g * t;
-
-    // scale arrow size (adjust if needed)
-    let arrowScale = 0.5;
-
-    let dx = vx_current * arrowScale;
-    let dy = vy_current * arrowScale;
-
-    // convert to canvas coords
-    let startX = x * scale;
-    let startY = canvas.height - y * scale;
-
-    let endX = (x + dx) * scale;
-    let endY = canvas.height - (y + dy) * scale;
-
-    // draw line
-    ctx.strokeStyle = "green";
-    ctx.lineWidth = 2;
-
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    ctx.lineTo(endX, endY);
-    ctx.stroke();
-
-    // arrow head
-    let angle = Math.atan2(endY - startY, endX - startX);
-
-    ctx.beginPath();
-    ctx.moveTo(endX, endY);
-    ctx.lineTo(endX - 8 * Math.cos(angle - 0.3), endY - 8 * Math.sin(angle - 0.3));
-    ctx.lineTo(endX - 8 * Math.cos(angle + 0.3), endY - 8 * Math.sin(angle + 0.3));
-    ctx.closePath();
-    ctx.fillStyle = "green";
-    ctx.fill();
-}
-
 // ---------------- CONTROLS ----------------
 v0Slider.addEventListener("input", () => {
     v0 = Number(v0Slider.value);
@@ -283,6 +262,17 @@ angleSlider.addEventListener("input", () => {
     angle = Number(angleSlider.value);
     reset();
 });
+
+gSlider.addEventListener("input", () => {
+    g = Number(gSlider.value);
+    reset();
+});
+
+function setGravityPreset(value) {
+    g = value;
+    gSlider.value = value; // sync slider
+    reset();
+}
 
 startBtn.onclick = () => {
     if (!running) {
