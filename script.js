@@ -145,7 +145,14 @@ function drawGrid() {
 function drawAxes() {
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
+    ctx.fillStyle = "black";
+    ctx.font = "12px Arial";
 
+    // origin is bottom-left
+    let originX = 0;
+    let originY = canvas.height;
+
+    // axis lines
     ctx.beginPath();
     ctx.moveTo(0, canvas.height);
     ctx.lineTo(canvas.width, canvas.height);
@@ -156,11 +163,36 @@ function drawAxes() {
     ctx.lineTo(0, 0);
     ctx.stroke();
 
-    ctx.fillStyle = "black";
-    ctx.font = "14px Arial";
+    // spacing in "meters" (based on scale)
+    let stepMeters = Math.max(5, Math.round((50 / scale) / 5) * 5);
 
+    // X-axis labels
+    for (let x = stepMeters; x < canvas.width / scale; x += stepMeters) {
+        let px = x * scale;
+
+        ctx.beginPath();
+        ctx.moveTo(px, canvas.height);
+        ctx.lineTo(px, canvas.height - 5);
+        ctx.stroke();
+
+        ctx.fillText(x.toFixed(0), px - 10, canvas.height - 10);
+    }
+
+    // Y-axis labels
+    for (let y = stepMeters; y < canvas.height / scale; y += stepMeters) {
+        let py = canvas.height - y * scale;
+
+        ctx.beginPath();
+        ctx.moveTo(0, py);
+        ctx.lineTo(5, py);
+        ctx.stroke();
+
+        ctx.fillText(y.toFixed(0), 5, py + 4);
+    }
+
+    // axis titles
     ctx.fillText("x (m)", canvas.width - 40, canvas.height - 10);
-    ctx.fillText("y (m)", 10, 20);
+    ctx.fillText("y (m)", 10, 15);
 }
 
 // ---------------- DRAW ----------------
