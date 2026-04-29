@@ -1,11 +1,6 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// UI elements
-const timeDisplay = document.getElementById("time");
-const heightDisplay = document.getElementById("height");
-const rangeDisplay = document.getElementById("range");
-
 // Physics
 let v0 = 80;
 let angle = 45;
@@ -17,7 +12,7 @@ let t = 0;
 let running = true;
 let points = [];
 
-// Tracking values
+// Tracking
 let maxHeight = 0;
 let finalRange = 0;
 
@@ -25,7 +20,7 @@ let finalRange = 0;
 let vx, vy, theta;
 let scale;
 
-// ---------- RESET ----------
+// ---------------- RESET ----------------
 function reset() {
     t = 0;
     points = [];
@@ -43,7 +38,7 @@ function reset() {
     scale = canvas.width / (range * 1.2);
 }
 
-// ---------- STEP ----------
+// ---------------- UPDATE ----------------
 function step() {
     if (!running) return;
 
@@ -55,7 +50,6 @@ function step() {
     if (y < 0) {
         running = false;
         finalRange = x;
-
         updateUI();
         draw();
         return;
@@ -71,14 +65,20 @@ function step() {
     requestAnimationFrame(step);
 }
 
-// ---------- UI UPDATE ----------
+// ---------------- SAFE UI ----------------
 function updateUI() {
-    timeDisplay.textContent = t.toFixed(2);
-    heightDisplay.textContent = maxHeight.toFixed(2);
-    rangeDisplay.textContent = finalRange.toFixed(2);
+    const timeEl = document.getElementById("time");
+    const heightEl = document.getElementById("height");
+    const rangeEl = document.getElementById("range");
+
+    if (!timeEl || !heightEl || !rangeEl) return;
+
+    timeEl.textContent = t.toFixed(2);
+    heightEl.textContent = maxHeight.toFixed(2);
+    rangeEl.textContent = finalRange.toFixed(2);
 }
 
-// ---------- GRID ----------
+// ---------------- GRID ----------------
 function drawGrid() {
     ctx.strokeStyle = "#e6e6e6";
     ctx.lineWidth = 1;
@@ -100,16 +100,18 @@ function drawGrid() {
     }
 }
 
-// ---------- AXES ----------
+// ---------------- AXES ----------------
 function drawAxes() {
     ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
 
+    // x-axis
     ctx.beginPath();
     ctx.moveTo(0, canvas.height);
     ctx.lineTo(canvas.width, canvas.height);
     ctx.stroke();
 
+    // y-axis
     ctx.beginPath();
     ctx.moveTo(0, canvas.height);
     ctx.lineTo(0, 0);
@@ -122,7 +124,7 @@ function drawAxes() {
     ctx.fillText("y (height)", 10, 20);
 }
 
-// ---------- DRAW ----------
+// ---------------- DRAW ----------------
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -145,7 +147,7 @@ function draw() {
 
     ctx.stroke();
 
-    // projectile dot
+    // moving projectile dot
     if (points.length > 0) {
         let last = points[points.length - 1];
 
@@ -159,6 +161,6 @@ function draw() {
     }
 }
 
-// ---------- START ----------
+// ---------------- START ----------------
 reset();
 step();
