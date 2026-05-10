@@ -10,59 +10,76 @@
 
 <h1>Projectile Motion Simulator</h1>
 
-<div id="controls">
-    <label>Velocity: <span id="v0Label">80</span> m/s</label><br>
-    <input type="range" id="v0" min="10" max="150" value="80"><br><br>
+<div id="mainLayout">
 
-    <label>Angle: <span id="angleLabel">45</span> °</label><br>
-    <input type="range" id="angle" min="5" max="85" value="45"><br><br>
+    <!-- LEFT PANEL -->
+    <div id="controlPanel">
 
-    <label>Gravity: <span id="gLabel">9.8</span> m/s²</label><br>
-    <input type="range" id="gSlider" min="1" max="25" step="0.1" value="9.8"><br><br>
+        <h2>Control Panel</h2>
 
-    <label>Mass: <span id="massLabel">1.0</span> kg</label><br>
-    <input type="range" id="massSlider" min="0.1" max="20" step="0.1" value="1.0"><br><br>
+        <label>Velocity: <span id="v0Label">80</span> m/s</label><br>
+        <input type="range" id="v0" min="10" max="150" value="80"><br><br>
 
-    <div id="gravityControls">
-        <button onclick="setGravityPreset(9.8)">Earth</button>
-        <button onclick="setGravityPreset(1.6)">Moon</button>
-        <button onclick="setGravityPreset(3.7)">Mars</button>
-        <button onclick="setGravityPreset(24.8)">Jupiter</button>
+        <label>Angle: <span id="angleLabel">45</span> °</label><br>
+        <input type="range" id="angle" min="5" max="85" value="45"><br><br>
+
+        <label>Gravity: <span id="gLabel">9.8</span> m/s²</label><br>
+        <input type="range" id="gSlider" min="1" max="25" step="0.1" value="9.8"><br><br>
+
+        <label>Mass: <span id="massLabel">1.0</span> kg</label><br>
+        <input type="range" id="massSlider" min="0.1" max="20" step="0.1" value="1.0"><br><br>
+
+        <div id="gravityControls">
+            <button onclick="setGravityPreset(9.8)">Earth</button>
+            <button onclick="setGravityPreset(1.6)">Moon</button>
+            <button onclick="setGravityPreset(3.7)">Mars</button>
+            <button onclick="setGravityPreset(24.8)">Jupiter</button>
+        </div>
+
+        <br>
+
+        <button id="startBtn">Start</button>
+        <button id="pauseBtn">Pause</button>
+        <button id="resetBtn">Reset</button>
+
     </div>
 
-    <br>
-
-    <button id="startBtn">Start</button>
-    <button id="pauseBtn">Pause</button>
-    <button id="resetBtn">Reset</button>
-</div>
-
-<canvas id="canvas" width="600" height="400"></canvas>
-
-<div id="stats">
-    <p>Time: <span id="time">0</span> s</p>
-    <p>Max Height: <span id="height">0</span> m</p>
-    <p>Range: <span id="range">0</span> m</p>
-    <p>Position: (<span id="xPos">0</span>, <span id="yPos">0</span>) m</p>
-
-    <hr>
-
-    <h2>Energy</h2>
-
-    <p>Kinetic Energy: <span id="keValue">0</span> J</p>
-    <div class="energyBarContainer">
-        <div id="keBar" class="energyBar"></div>
+    <!-- CENTER CANVAS -->
+    <div id="canvasContainer">
+        <canvas id="canvas" width="700" height="500"></canvas>
     </div>
 
-    <p>Potential Energy: <span id="peValue">0</span> J</p>
-    <div class="energyBarContainer">
-        <div id="peBar" class="energyBar"></div>
+    <!-- RIGHT PANEL -->
+    <div id="statsPanel">
+
+        <h2>Stats</h2>
+
+        <p>Time: <span id="time">0</span> s</p>
+        <p>Max Height: <span id="height">0</span> m</p>
+        <p>Range: <span id="range">0</span> m</p>
+        <p>Position: (<span id="xPos">0</span>, <span id="yPos">0</span>) m</p>
+
+        <hr>
+
+        <h3>Energy</h3>
+
+        <p>Kinetic Energy: <span id="keValue">0</span> J</p>
+        <div class="energyBarContainer">
+            <div id="keBar" class="energyBar"></div>
+        </div>
+
+        <p>Potential Energy: <span id="peValue">0</span> J</p>
+        <div class="energyBarContainer">
+            <div id="peBar" class="energyBar"></div>
+        </div>
+
+        <p>Total Energy: <span id="teValue">0</span> J</p>
+        <div class="energyBarContainer">
+            <div id="teBar" class="energyBar"></div>
+        </div>
+
     </div>
 
-    <p>Total Energy: <span id="teValue">0</span> J</p>
-    <div class="energyBarContainer">
-        <div id="teBar" class="energyBar"></div>
-    </div>
 </div>
 
 <script src="script.js"></script>

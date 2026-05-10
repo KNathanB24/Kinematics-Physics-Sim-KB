@@ -1,9 +1,11 @@
+
+/* ================= BASE ================= */
 body {
     font-family: Arial, sans-serif;
-    text-align: center;
     background-color: #f4f4f4;
     margin: 0;
     padding: 20px;
+    text-align: center;
 }
 
 h1 {
@@ -11,35 +13,50 @@ h1 {
     color: #222;
 }
 
-#controls {
-    background-color: white;
-    width: 650px;
-    margin: 0 auto 20px auto;
-    padding: 20px;
+/* ================= MAIN LAYOUT ================= */
+#mainLayout {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ================= LEFT: CONTROL PANEL ================= */
+#controlPanel {
+    width: 260px;
+    background: white;
+    padding: 15px;
 
     border-radius: 12px;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 
     text-align: center;
 }
 
+#controlPanel h2 {
+    margin-top: 0;
+}
+
 /* labels */
-#controls label {
+#controlPanel label {
     font-weight: bold;
     color: #333;
-    font-size: 16px;
+    font-size: 15px;
 }
 
 /* sliders */
 input[type="range"] {
-    width: 300px;
-    margin-top: 8px;
-    margin-bottom: 10px;
+    width: 220px;
+    margin: 6px 0 12px 0;
 }
 
+/* buttons */
 button {
-    padding: 10px 16px;
-    margin: 5px;
+    padding: 8px 12px;
+    margin: 4px;
 
     border: none;
     border-radius: 8px;
@@ -47,7 +64,7 @@ button {
     background-color: #2d89ef;
     color: white;
 
-    font-size: 14px;
+    font-size: 13px;
     cursor: pointer;
 
     transition: background-color 0.2s ease;
@@ -61,55 +78,59 @@ button:hover {
     margin-top: 10px;
 }
 
-/* ---------------- CANVAS ---------------- */
+/* ================= CENTER: CANVAS ================= */
+#canvasContainer {
+    flex: 1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 canvas {
     background-color: white;
     border: 2px solid black;
 
     border-radius: 10px;
 
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-    margin-top: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-/* ---------------- STATS PANEL ---------------- */
-#stats {
-    background-color: white;
-
-    width: 650px;
-    margin: 20px auto 0 auto;
+/* ================= RIGHT: STATS ================= */
+#statsPanel {
+    width: 300px;
+    background: white;
     padding: 15px;
 
     border-radius: 12px;
-    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 
-    font-size: 18px;
-    color: #222;
+    text-align: left;
 }
 
-#stats p {
-    margin: 8px 0;
+#statsPanel h2,
+#statsPanel h3 {
+    text-align: center;
+    margin-top: 0;
 }
 
-/* ---------------- ENERGY SECTION ---------------- */
-#stats h2 {
-    margin-top: 15px;
+#statsPanel p {
+    margin: 6px 0;
+    font-size: 15px;
 }
 
-/* energy bars container */
+/* ================= ENERGY BARS ================= */
 .energyBarContainer {
     width: 100%;
-    height: 22px;
+    height: 18px;
 
     background-color: #ddd;
+    border-radius: 8px;
 
-    border-radius: 10px;
     overflow: hidden;
-
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
-/* base energy bar */
 .energyBar {
     height: 100%;
     width: 0%;
@@ -117,29 +138,32 @@ canvas {
     transition: width 0.05s linear;
 }
 
-/* individual energies */
+/* KE / PE / TE colors */
 #keBar {
-    background-color: #ff4d4d; /* red */
+    background-color: #ff4d4d;
 }
 
 #peBar {
-    background-color: #4caf50; /* green */
+    background-color: #4caf50;
 }
 
 #teBar {
-    background-color: #3f51b5; /* blue */
+    background-color: #3f51b5;
 }
 
-/* ---------------- RESPONSIVE ---------------- */
-@media (max-width: 700px) {
-
-    #controls,
-    #stats,
-    canvas {
-        width: 95%;
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1000px) {
+    #mainLayout {
+        flex-direction: column;
+        align-items: center;
     }
 
-    input[type="range"] {
+    #controlPanel,
+    #statsPanel {
         width: 90%;
+    }
+
+    #canvasContainer {
+        width: 100%;
     }
 }
