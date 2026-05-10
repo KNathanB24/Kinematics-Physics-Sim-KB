@@ -1,0 +1,145 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+    color: #222;
+}
+
+#controls {
+    background-color: white;
+    width: 650px;
+    margin: 0 auto 20px auto;
+    padding: 20px;
+
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+
+    text-align: center;
+}
+
+/* labels */
+#controls label {
+    font-weight: bold;
+    color: #333;
+    font-size: 16px;
+}
+
+/* sliders */
+input[type="range"] {
+    width: 300px;
+    margin-top: 8px;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 10px 16px;
+    margin: 5px;
+
+    border: none;
+    border-radius: 8px;
+
+    background-color: #2d89ef;
+    color: white;
+
+    font-size: 14px;
+    cursor: pointer;
+
+    transition: background-color 0.2s ease;
+}
+
+button:hover {
+    background-color: #1b5fa7;
+}
+
+#gravityControls {
+    margin-top: 10px;
+}
+
+/* ---------------- CANVAS ---------------- */
+canvas {
+    background-color: white;
+    border: 2px solid black;
+
+    border-radius: 10px;
+
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    margin-top: 10px;
+}
+
+/* ---------------- STATS PANEL ---------------- */
+#stats {
+    background-color: white;
+
+    width: 650px;
+    margin: 20px auto 0 auto;
+    padding: 15px;
+
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+
+    font-size: 18px;
+    color: #222;
+}
+
+#stats p {
+    margin: 8px 0;
+}
+
+/* ---------------- ENERGY SECTION ---------------- */
+#stats h2 {
+    margin-top: 15px;
+}
+
+/* energy bars container */
+.energyBarContainer {
+    width: 100%;
+    height: 22px;
+
+    background-color: #ddd;
+
+    border-radius: 10px;
+    overflow: hidden;
+
+    margin-bottom: 15px;
+}
+
+/* base energy bar */
+.energyBar {
+    height: 100%;
+    width: 0%;
+
+    transition: width 0.05s linear;
+}
+
+/* individual energies */
+#keBar {
+    background-color: #ff4d4d; /* red */
+}
+
+#peBar {
+    background-color: #4caf50; /* green */
+}
+
+#teBar {
+    background-color: #3f51b5; /* blue */
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+@media (max-width: 700px) {
+
+    #controls,
+    #stats,
+    canvas {
+        width: 95%;
+    }
+
+    input[type="range"] {
+        width: 90%;
+    }
+}
