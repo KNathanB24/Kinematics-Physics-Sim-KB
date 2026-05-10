@@ -121,9 +121,9 @@ function updateUI(currentX = 0, currentY = 0) {
     if (xPosEl) xPosEl.textContent = currentX.toFixed(2);
     if (yPosEl) yPosEl.textContent = Math.max(0, currentY).toFixed(2);
 
-    v0Label.textContent = v0 + " m/s";
-    angleLabel.textContent = angle + " °";
-    gLabel.textContent = g.toFixed(1) + " m/s²";
+    v0Label.textContent = v0;
+    angleLabel.textContent = angle;
+    gLabel.textContent = g.toFixed(1);
 }
 
 // ---------------- GRID ----------------
