@@ -123,7 +123,7 @@ function updateUI(currentX = 0, currentY = 0) {
 
     v0Label.textContent = v0;
     angleLabel.textContent = angle;
-    gLabel.textContent = g.toFixed(1);
+    gLabel.textContent = g.toFixed(1) + " m/s²";
 }
 
 // ---------------- GRID ----------------
