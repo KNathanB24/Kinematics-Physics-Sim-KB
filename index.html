@@ -3,37 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <title>2D-Kinematics Simulator</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>2D-Kinematics Simulator</h1>
+<h1>Projectile Motion Simulator</h1>
 
 <div id="mainLayout">
 
-    <!-- LEFT PANEL -->
+    <!-- LEFT: CONTROL PANEL -->
     <div id="controlPanel">
 
         <h2>Control Panel</h2>
 
-        <label>Velocity: <span id="v0Label">80</span> m/s</label><br>
-        <input type="range" id="v0" min="10" max="150" value="80"><br><br>
+        <div class="controlSection">
 
-        <label>Angle: <span id="angleLabel">45</span> °</label><br>
-        <input type="range" id="angle" min="5" max="85" value="45"><br><br>
+            <label>Velocity: <span id="v0Label">80</span> m/s</label><br>
+            <input type="range" id="v0" min="10" max="150" value="80">
 
-        <label>Gravity: <span id="gLabel">9.8</span> m/s²</label><br>
-        <input type="range" id="gSlider" min="1" max="25" step="0.1" value="9.8"><br><br>
+        </div>
 
-        <label>Mass: <span id="massLabel">1.0</span> kg</label><br>
-        <input type="range" id="massSlider" min="0.1" max="20" step="0.1" value="1.0"><br><br>
+        <div class="controlSection">
 
-        <div id="gravityControls">
-            <button onclick="setGravityPreset(9.8)">Earth</button>
-            <button onclick="setGravityPreset(1.6)">Moon</button>
-            <button onclick="setGravityPreset(3.7)">Mars</button>
-            <button onclick="setGravityPreset(24.8)">Jupiter</button>
+            <label>Angle: <span id="angleLabel">45</span> °</label><br>
+            <input type="range" id="angle" min="5" max="85" value="45">
+
+        </div>
+
+        <!-- GRAVITY SECTION (GROUPED) -->
+        <div class="controlSection">
+
+            <label>Gravity: <span id="gLabel">9.8</span> m/s²</label><br>
+            <input type="range" id="gSlider" min="1" max="25" step="0.1" value="9.8">
+
+            <div id="gravityControls">
+                <button onclick="setGravityPreset(9.8)">Earth</button>
+                <button onclick="setGravityPreset(1.6)">Moon</button>
+                <button onclick="setGravityPreset(3.7)">Mars</button>
+                <button onclick="setGravityPreset(24.8)">Jupiter</button>
+            </div>
+
+        </div>
+
+        <div class="controlSection">
+
+            <label>Mass: <span id="massLabel">1.0</span> kg</label><br>
+            <input type="range" id="massSlider" min="0.1" max="20" step="0.1" value="1.0">
+
         </div>
 
         <br>
@@ -44,12 +62,12 @@
 
     </div>
 
-    <!-- CENTER CANVAS -->
+    <!-- CENTER: CANVAS -->
     <div id="canvasContainer">
         <canvas id="canvas" width="700" height="500"></canvas>
     </div>
 
-    <!-- RIGHT PANEL -->
+    <!-- RIGHT: STATS -->
     <div id="statsPanel">
 
         <h2>Stats</h2>
