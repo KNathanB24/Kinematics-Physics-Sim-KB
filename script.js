@@ -60,6 +60,9 @@ let finalRange = 0;
 // velocity
 let vx, vy, theta;
 
+// exact landing time
+let flightTime = 0;
+
 // ---------------- AUTO SCALE ----------------
 let maxX = 0;
 let maxY = 0;
@@ -83,6 +86,10 @@ function setupPhysics() {
 
     initialTotalEnergy =
         0.5 * mass * (vx * vx + vy * vy) + mass * g * h;
+
+    // exact total flight time for y(t) = h + vy*t - 0.5*g*t^2 = 0
+    // positive root only
+    flightTime = (vy + Math.sqrt(vy * vy + 2 * g * h)) / g;
 }
 
 // ---------------- RESET ----------------
@@ -118,24 +125,14 @@ function step() {
     if (!running) return;
 
     let dt = 0.05 * timeScale;
-    let previousT = t;
+    let nextT = t + dt;
 
-    t += dt;
+    // If the next frame would pass the ground, snap to the exact landing time.
+    if (nextT >= flightTime) {
+        t = flightTime;
 
-    // REAL physics position
-    let x = vx * t;
-    let y = h + vy * t - 0.5 * g * t * t;
-
-    // LANDING CONDITION
-    if (y < 0) {
-        // solve exact impact time by linear interpolation between the last two points
-        let y1 = h + vy * previousT - 0.5 * g * previousT * previousT;
-        let alpha = y1 / (y1 - y);
-
-        t = previousT + alpha * dt;
-
-        x = vx * t;
-        y = 0;
+        let x = vx * t;
+        let y = 0;
 
         running = false;
         finalRange = x;
@@ -149,8 +146,15 @@ function step() {
         updateEnergy(x, y);
         updateUI(x, y);
         draw();
+
         return;
     }
+
+    t = nextT;
+
+    // REAL physics position
+    let x = vx * t;
+    let y = h + vy * t - 0.5 * g * t * t;
 
     // DISPLAY only
     let displayY = Math.max(0, y);
@@ -173,7 +177,6 @@ function step() {
 
     updateEnergy(x, y);
     updateUI(x, displayY);
-
     draw();
 
     animationId = requestAnimationFrame(step);
@@ -181,6 +184,7 @@ function step() {
 
 // ---------------- ENERGY SYSTEM ----------------
 function updateEnergy(x, y) {
+    // exact analytic velocity at time t
     let vx_current = vx;
     let vy_current = vy - g * t;
 
