@@ -125,6 +125,19 @@ canvas {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
+#controlPanel,
+#statsPanel,
+#instructions {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#controlPanel:hover,
+#statsPanel:hover,
+#instructions:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+
 .energyBarContainer {
     width: 100%;
     height: 18px;
