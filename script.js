@@ -36,11 +36,12 @@ const teBar = document.getElementById("teBar");
 const instructions = document.getElementById("instructions");
 const instructionsHeader = document.getElementById("instructionsHeader");
 
-if (instructionsHeader) {
-    instructionsHeader.onclick = () => {
-        instructions.classList.toggle("collapsed");
-    };
-}
+// start CLOSED
+instructions.classList.add("collapsed");
+
+instructionsHeader.onclick = () => {
+    instructions.classList.toggle("collapsed");
+};
 
 // ---------------- PHYSICS ----------------
 let v0 = 80;
