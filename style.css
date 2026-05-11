@@ -1,11 +1,18 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background: linear-gradient(135deg, #e5e5e5, #d6deea);
     margin: 0;
     padding: 20px;
     text-align: center;
 
-    background: linear-gradient(135deg, #f4f4f4, #e9eef5);
+    body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+
+    background: radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.08));
+}
 }
 
 h1 {
