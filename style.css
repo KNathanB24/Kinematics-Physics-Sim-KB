@@ -37,18 +37,28 @@ h1 {
     text-align: left;
 }
 
+/* heading spacing */
 #instructions h2 {
     text-align: center;
     margin-top: 0;
+    margin-bottom: 8px;
 }
 
+/* paragraph spacing */
+#instructions p {
+    margin: 6px 0;
+    line-height: 1.4;
+}
+
+/* LIST FIX — this is the important part */
 #instructions ul {
-    margin: 10px 0;
-    padding-left: 20px;
+    margin: 6px 0;
+    padding-left: 18px;  /* reduces huge indent */
 }
 
 #instructions li {
-    margin: 6px 0;
+    margin: 4px 0;       /* tight vertical spacing */
+    line-height: 1.3;
 }
 
 /* ================= CONTROL PANEL ================= */
