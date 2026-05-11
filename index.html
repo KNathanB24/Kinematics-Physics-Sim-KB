@@ -11,31 +11,36 @@
 
 <h1>2D-Kinematics Simulator</h1>
 
-<div id="instructions">
+<div id="instructions" class="collapsible">
 
-    <h2>How to Use</h2>
+    <div id="instructionsHeader">
+        <h2>How to Use ▼</h2>
+    </div>
 
-    <p>
-        This simulator models 2D projectile motion using basic physics equations.
-    </p>
+    <div id="instructionsContent">
 
-    <ul>
-        <li>Adjust <b>velocity</b> and <b>angle</b> to change the trajectory</li>
-        <li>Change <b>gravity</b> or use planet presets (Earth, Moon, Mars, Jupiter)</li>
-        <li>Adjust <b>mass</b> (affects energy calculations)</li>
-        <li>Press <b>Start</b> to launch the projectile</li>
-        <li>Use <b>Pause</b> or <b>Reset</b> to control the simulation</li>
-    </ul>
+        <p>
+            This simulator models 2D projectile motion using basic physics equations.
+        </p>
 
-    <p>
-        Watch how the path, height, and range change as parameters are adjusted.
-    </p>
+        <ul>
+            <li>Adjust <b>velocity</b> and <b>angle</b> to change trajectory</li>
+            <li>Change <b>gravity</b> or use planet presets</li>
+            <li>Adjust <b>mass</b> (affects energy calculations)</li>
+            <li>Press <b>Start</b> to launch</li>
+            <li>Use <b>Pause</b> or <b>Reset</b></li>
+        </ul>
 
+        <p>
+            Watch height, range, and energy evolve in real time.
+        </p>
+
+    </div>
 </div>
 
 <div id="mainLayout">
 
-    <!-- LEFT: CONTROL PANEL -->
+    <!-- CONTROL PANEL -->
     <div id="controlPanel">
 
         <h2>Control Panel</h2>
@@ -75,12 +80,12 @@
 
     </div>
 
-    <!-- CENTER: CANVAS -->
+    <!-- CANVAS -->
     <div id="canvasContainer">
         <canvas id="canvas" width="700" height="500"></canvas>
     </div>
 
-    <!-- RIGHT: STATS -->
+    <!-- STATS -->
     <div id="statsPanel">
 
         <h2>Stats</h2>
@@ -88,6 +93,7 @@
         <p>Time: <span id="time">0</span> s</p>
         <p>Max Height: <span id="height">0</span> m</p>
         <p>Range: <span id="range">0</span> m</p>
+
         <p>Position: (<span id="xPos">0</span>, <span id="yPos">0</span>) m</p>
 
         <hr>
@@ -95,19 +101,13 @@
         <h3>Energy</h3>
 
         <p>Kinetic Energy: <span id="keValue">0</span> J</p>
-        <div class="energyBarContainer">
-            <div id="keBar" class="energyBar"></div>
-        </div>
+        <div class="energyBarContainer"><div id="keBar" class="energyBar"></div></div>
 
         <p>Potential Energy: <span id="peValue">0</span> J</p>
-        <div class="energyBarContainer">
-            <div id="peBar" class="energyBar"></div>
-        </div>
+        <div class="energyBarContainer"><div id="peBar" class="energyBar"></div></div>
 
         <p>Total Energy: <span id="teValue">0</span> J</p>
-        <div class="energyBarContainer">
-            <div id="teBar" class="energyBar"></div>
-        </div>
+        <div class="energyBarContainer"><div id="teBar" class="energyBar"></div></div>
 
     </div>
 
