@@ -96,10 +96,20 @@ button {
     border: none;
     border-radius: 8px;
 
-    background-color: #2d89ef;
+    background-color: linear-gradient(135deg, #2d89ef, #1b6fd6);
     color: white;
 
     cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(45,137,239,0.3);
+}
+
+button:active {
+    transform: translateY(0px);
 }
 
 /* ================= CANVAS ================= */
@@ -111,8 +121,9 @@ button {
 
 canvas {
     background: white;
-    border: 2px solid black;
-    border-radius: 10px;
+    border: 1px solid #d0d0d0;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
 }
 
 /* ================= STATS ================= */
