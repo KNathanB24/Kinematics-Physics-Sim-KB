@@ -4,6 +4,8 @@ body {
     margin: 0;
     padding: 20px;
     text-align: center;
+
+    background: linear-gradient(135deg, #f4f4f4, #e9eef5);
 }
 
 h1 {
