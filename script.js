@@ -36,7 +36,6 @@ const teBar = document.getElementById("teBar");
 const instructions = document.getElementById("instructions");
 const instructionsHeader = document.getElementById("instructionsHeader");
 
-// start CLOSED
 instructions.classList.add("collapsed");
 
 instructionsHeader.onclick = () => {
@@ -50,7 +49,6 @@ let g = 9.8;
 let h = 0;
 let mass = 1.0;
 
-// ---------------- STATE ----------------
 let t = 0;
 let running = false;
 let points = [];
@@ -58,27 +56,20 @@ let points = [];
 let maxHeight = 0;
 let finalRange = 0;
 
-// velocity
 let vx, vy, theta;
 
-// exact landing time
 let flightTime = 0;
 
-// ---------------- AUTO SCALE ----------------
 let maxX = 0;
 let maxY = 0;
 let scale = 1;
 
-// ---------------- TIME CONTROL ----------------
 let timeScale = 0.4;
 
-// ---------------- ENERGY ----------------
 let initialTotalEnergy = 1;
 
-// ---------------- ANIMATION ID ----------------
 let animationId = null;
 
-// ---------------- SETUP ----------------
 function setupPhysics() {
     theta = angle * Math.PI / 180;
 
@@ -88,8 +79,6 @@ function setupPhysics() {
     initialTotalEnergy =
         0.5 * mass * (vx * vx + vy * vy) + mass * g * h;
 
-    // exact total flight time for y(t) = h + vy*t - 0.5*g*t^2 = 0
-    // positive root only
     flightTime = (vy + Math.sqrt(vy * vy + 2 * g * h)) / g;
 }
 
@@ -113,7 +102,6 @@ function reset() {
     setupPhysics();
     scale = 1;
 
-    // start the path at the launch point so the graph is never blank
     points.push({ x: 0, y: h });
 
     updateEnergy(0, h);
@@ -128,7 +116,6 @@ function step() {
     let dt = 0.05 * timeScale;
     let nextT = t + dt;
 
-    // If the next frame would pass the ground, snap to the exact landing time.
     if (nextT >= flightTime) {
         t = flightTime;
 
@@ -153,14 +140,11 @@ function step() {
 
     t = nextT;
 
-    // REAL physics position
     let x = vx * t;
     let y = h + vy * t - 0.5 * g * t * t;
 
-    // DISPLAY only
     let displayY = Math.max(0, y);
 
-    // track bounds (physics-based)
     if (x > maxX) maxX = x;
     if (y > maxY) maxY = y;
 
@@ -185,7 +169,6 @@ function step() {
 
 // ---------------- ENERGY SYSTEM ----------------
 function updateEnergy(x, y) {
-    // exact analytic velocity at time t
     let vx_current = vx;
     let vy_current = vy - g * t;
 
@@ -210,7 +193,6 @@ function updateEnergy(x, y) {
     teBar.style.width = Math.min(100, Math.max(0, tePercent)) + "%";
 }
 
-// ---------------- UI UPDATE ----------------
 function updateUI(currentX = 0, currentY = 0) {
     timeEl.textContent = t.toFixed(2);
     heightEl.textContent = maxHeight.toFixed(2);
@@ -266,7 +248,6 @@ function drawAxes() {
 
     let stepMeters = Math.max(5, Math.round((50 / scale) / 5) * 5);
 
-    // x ticks
     for (let x = stepMeters; x < canvas.width / scale; x += stepMeters) {
         let px = x * scale;
 
@@ -278,7 +259,6 @@ function drawAxes() {
         ctx.fillText(x.toFixed(0), px - 10, canvas.height - 10);
     }
 
-    // y ticks
     for (let y = stepMeters; y < canvas.height / scale; y += stepMeters) {
         let py = canvas.height - y * scale;
 

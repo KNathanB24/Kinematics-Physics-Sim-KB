@@ -1,24 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* ================= BASE ================= */
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Inter", Arial, sans-serif;
     background: linear-gradient(135deg, #e6edf7, #dbe6f3);
     margin: 0;
     padding: 20px;
     text-align: center;
 
-    body::before {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* soft vignette overlay */
+body::before {
     content: "";
     position: fixed;
     inset: 0;
     pointer-events: none;
-
     background: radial-gradient(circle at center, transparent 60%, rgba(0,0,0,0.08));
 }
-}
 
+/* ================= HEADINGS ================= */
 h1 {
     margin-bottom: 20px;
     color: #222;
     letter-spacing: 0.5px;
+    font-weight: 700;
 }
 
 #controlPanel h2,
@@ -39,6 +47,8 @@ h1 {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 
     text-align: left;
+
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 #instructionsHeader {
@@ -88,6 +98,8 @@ h1 {
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 
     text-align: center;
+
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .controlSection {
@@ -103,6 +115,7 @@ input[type="range"] {
     width: 220px;
 }
 
+/* ================= BUTTONS ================= */
 button {
     padding: 8px 12px;
     margin: 4px;
@@ -151,14 +164,11 @@ canvas {
 
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
 
-#controlPanel,
-#statsPanel,
-#instructions {
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* hover lift for panels */
 #controlPanel:hover,
 #statsPanel:hover,
 #instructions:hover {
@@ -166,6 +176,7 @@ canvas {
     box-shadow: 0 8px 18px rgba(0,0,0,0.12);
 }
 
+/* ================= ENERGY BARS ================= */
 .energyBarContainer {
     width: 100%;
     height: 18px;
@@ -184,3 +195,9 @@ canvas {
 #keBar { background: #ff4d4d; box-shadow: inset 0 0 6px rgba(255,255,255,0.2); }
 #peBar { background: #4caf50; box-shadow: inset 0 0 6px rgba(255,255,255,0.2); }
 #teBar { background: #3f51b5; box-shadow: inset 0 0 6px rgba(255,255,255,0.2); }
+
+/* ================= SCIENTIFIC NUMBER LOOK ================= */
+#statsPanel span {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
