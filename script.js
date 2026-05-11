@@ -117,25 +117,37 @@ function step() {
 
     // LANDING CONDITION
     if (y < 0) {
-        running = false;
-        finalRange = x;
 
-        updateEnergy(x, y);
-        updateUI(x, 0);
+    // solve exact impact time
+    let dt = 0.05 * timeScale;
 
-        draw();
-        return;
-    }
+    let t1 = t - dt; // previous time
+    let t2 = t;      // current overshot time
 
-    if (y > maxHeight) maxHeight = y;
+    // previous y
+    let y1 = h + vy * t1 - 0.5 * g * t1 * t1;
+
+    // interpolation factor
+    let alpha = y1 / (y1 - y);
+
+    // exact landing time
+    t = t1 + alpha * (t2 - t1);
+
+    // exact landing position
+    x = vx * t;
+    y = 0;
+
+    running = false;
+    finalRange = x;
 
     points.push({ x, y });
 
     updateEnergy(x, y);
-    updateUI(x, displayY);
+    updateUI(x, y);
 
     draw();
-    requestAnimationFrame(step);
+    return;
+    }
 }
 
 // ---------------- ENERGY SYSTEM ----------------
@@ -147,7 +159,7 @@ function updateEnergy(x, y) {
     let v = Math.sqrt(vx_current * vx_current + vy_current * vy_current);
 
     let KE = 0.5 * mass * v * v;
-    let PE = mass * g * Math.max(0, y); 
+    let PE = mass * g * y;
     let TE = KE + PE;
 
     keValue.textContent = KE.toFixed(1);
