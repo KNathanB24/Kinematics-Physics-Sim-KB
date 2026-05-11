@@ -1,6 +1,7 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+// ---------------- UI ----------------
 const v0Slider = document.getElementById("v0");
 const angleSlider = document.getElementById("angle");
 const gSlider = document.getElementById("gSlider");
@@ -22,6 +23,7 @@ const rangeEl = document.getElementById("range");
 const xPosEl = document.getElementById("xPos");
 const yPosEl = document.getElementById("yPos");
 
+// ---------------- ENERGY UI ----------------
 const keValue = document.getElementById("keValue");
 const peValue = document.getElementById("peValue");
 const teValue = document.getElementById("teValue");
@@ -61,6 +63,7 @@ let initialTotalEnergy = 1;
 
 // ---------------- SETUP ----------------
 function setupPhysics() {
+
     theta = angle * Math.PI / 180;
 
     vx = v0 * Math.cos(theta);
@@ -72,6 +75,7 @@ function setupPhysics() {
 
 // ---------------- RESET ----------------
 function reset() {
+
     t = 0;
     points = [];
     running = false;
@@ -83,29 +87,66 @@ function reset() {
     maxY = 0;
 
     setupPhysics();
+
     scale = 1;
 
     updateEnergy(0, h);
+    updateUI(0, h);
     draw();
-    updateUI(0, 0);
 }
 
-// ---------------- LOOP ----------------
+// ---------------- MAIN LOOP ----------------
 function step() {
+
     if (!running) return;
 
-    t += 0.05 * timeScale;
+    // timestep
+    let dt = 0.05 * timeScale;
 
-    // REAL physics position
+    t += dt;
+
+    // current position
     let x = vx * t;
     let y = h + vy * t - 0.5 * g * t * t;
 
-    // DISPLAY only
+    // ---------------- LANDING DETECTION ----------------
+    if (y < 0) {
+
+        // previous timestep
+        let t1 = t - dt;
+        let t2 = t;
+
+        let y1 = h + vy * t1 - 0.5 * g * t1 * t1;
+
+        // interpolation factor
+        let alpha = y1 / (y1 - y);
+
+        // exact impact time
+        t = t1 + alpha * (t2 - t1);
+
+        // exact impact position
+        x = vx * t;
+        y = 0;
+
+        running = false;
+        finalRange = x;
+
+        points.push({ x, y });
+
+        updateEnergy(x, y);
+        updateUI(x, y);
+
+        draw();
+        return;
+    }
+
+    // ---------------- DISPLAY ----------------
     let displayY = Math.max(0, y);
 
-    // track bounds (physics-based)
     if (x > maxX) maxX = x;
     if (y > maxY) maxY = y;
+
+    if (y > maxHeight) maxHeight = y;
 
     let worldWidth = Math.max(maxX, 1);
     let worldHeight = Math.max(maxY, 1);
@@ -115,39 +156,14 @@ function step() {
 
     scale = Math.min(scaleX, scaleY);
 
-    // LANDING CONDITION
-    if (y < 0) {
-
-    // solve exact impact time
-    let dt = 0.05 * timeScale;
-
-    let t1 = t - dt; // previous time
-    let t2 = t;      // current overshot time
-
-    // previous y
-    let y1 = h + vy * t1 - 0.5 * g * t1 * t1;
-
-    // interpolation factor
-    let alpha = y1 / (y1 - y);
-
-    // exact landing time
-    t = t1 + alpha * (t2 - t1);
-
-    // exact landing position
-    x = vx * t;
-    y = 0;
-
-    running = false;
-    finalRange = x;
-
     points.push({ x, y });
 
     updateEnergy(x, y);
-    updateUI(x, y);
+    updateUI(x, displayY);
 
     draw();
-    return;
-    }
+
+    requestAnimationFrame(step);
 }
 
 // ---------------- ENERGY SYSTEM ----------------
@@ -156,9 +172,11 @@ function updateEnergy(x, y) {
     let vx_current = vx;
     let vy_current = vy - g * t;
 
-    let v = Math.sqrt(vx_current * vx_current + vy_current * vy_current);
+    let speedSquared =
+        vx_current * vx_current +
+        vy_current * vy_current;
 
-    let KE = 0.5 * mass * v * v;
+    let KE = 0.5 * mass * speedSquared;
     let PE = mass * g * y;
     let TE = KE + PE;
 
@@ -175,6 +193,7 @@ function updateEnergy(x, y) {
     teBar.style.width = Math.min(100, tePercent) + "%";
 }
 
+// ---------------- UI ----------------
 function updateUI(currentX = 0, currentY = 0) {
 
     timeEl.textContent = t.toFixed(2);
@@ -190,10 +209,13 @@ function updateUI(currentX = 0, currentY = 0) {
     massLabel.textContent = mass.toFixed(1);
 }
 
+// ---------------- GRID ----------------
 function drawGrid() {
+
     ctx.strokeStyle = "#e6e6e6";
 
     for (let x = 0; x < canvas.width; x += 40) {
+
         ctx.beginPath();
         ctx.moveTo(x, 0);
         ctx.lineTo(x, canvas.height);
@@ -201,6 +223,7 @@ function drawGrid() {
     }
 
     for (let y = 0; y < canvas.height; y += 40) {
+
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(canvas.width, y);
@@ -208,6 +231,7 @@ function drawGrid() {
     }
 }
 
+// ---------------- AXES ----------------
 function drawAxes() {
 
     ctx.strokeStyle = "black";
@@ -215,19 +239,24 @@ function drawAxes() {
     ctx.fillStyle = "black";
     ctx.font = "12px Arial";
 
+    // x-axis
     ctx.beginPath();
     ctx.moveTo(0, canvas.height);
     ctx.lineTo(canvas.width, canvas.height);
     ctx.stroke();
 
+    // y-axis
     ctx.beginPath();
     ctx.moveTo(0, canvas.height);
     ctx.lineTo(0, 0);
     ctx.stroke();
 
-    let stepMeters = Math.max(5, Math.round((50 / scale) / 5) * 5);
+    let stepMeters =
+        Math.max(5, Math.round((50 / scale) / 5) * 5);
 
+    // x ticks
     for (let x = stepMeters; x < canvas.width / scale; x += stepMeters) {
+
         let px = x * scale;
 
         ctx.beginPath();
@@ -238,7 +267,9 @@ function drawAxes() {
         ctx.fillText(x.toFixed(0), px - 10, canvas.height - 10);
     }
 
+    // y ticks
     for (let y = stepMeters; y < canvas.height / scale; y += stepMeters) {
+
         let py = canvas.height - y * scale;
 
         ctx.beginPath();
@@ -253,6 +284,7 @@ function drawAxes() {
     ctx.fillText("y (m)", 10, 15);
 }
 
+// ---------------- VELOCITY VECTOR ----------------
 function drawVelocityVector(x, y) {
 
     let vx_current = vx;
@@ -277,17 +309,29 @@ function drawVelocityVector(x, y) {
     ctx.lineTo(endX, endY);
     ctx.stroke();
 
-    let angle = Math.atan2(endY - startY, endX - startX);
+    let arrowAngle =
+        Math.atan2(endY - startY, endX - startX);
 
     ctx.beginPath();
     ctx.moveTo(endX, endY);
-    ctx.lineTo(endX - 8 * Math.cos(angle - 0.3), endY - 8 * Math.sin(angle - 0.3));
-    ctx.lineTo(endX - 8 * Math.cos(angle + 0.3), endY - 8 * Math.sin(angle + 0.3));
+
+    ctx.lineTo(
+        endX - 8 * Math.cos(arrowAngle - 0.3),
+        endY - 8 * Math.sin(arrowAngle - 0.3)
+    );
+
+    ctx.lineTo(
+        endX - 8 * Math.cos(arrowAngle + 0.3),
+        endY - 8 * Math.sin(arrowAngle + 0.3)
+    );
+
     ctx.closePath();
+
     ctx.fillStyle = "green";
     ctx.fill();
 }
 
+// ---------------- DRAW ----------------
 function draw() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -295,12 +339,14 @@ function draw() {
     drawGrid();
     drawAxes();
 
+    // trajectory
     ctx.strokeStyle = "blue";
     ctx.lineWidth = 2;
 
     ctx.beginPath();
 
     for (let i = 0; i < points.length; i++) {
+
         let px = points[i].x * scale;
         let py = canvas.height - points[i].y * scale;
 
@@ -310,13 +356,16 @@ function draw() {
 
     ctx.stroke();
 
+    // projectile
     if (points.length > 0) {
+
         let last = points[points.length - 1];
 
         let px = last.x * scale;
         let py = canvas.height - last.y * scale;
 
         ctx.fillStyle = "red";
+
         ctx.beginPath();
         ctx.arc(px, py, 6, 0, Math.PI * 2);
         ctx.fill();
@@ -325,6 +374,7 @@ function draw() {
     }
 }
 
+// ---------------- CONTROLS ----------------
 v0Slider.addEventListener("input", () => {
     v0 = Number(v0Slider.value);
     reset();
@@ -346,12 +396,15 @@ massSlider.addEventListener("input", () => {
 });
 
 window.setGravityPreset = function(value) {
+
     g = value;
     gSlider.value = value;
+
     reset();
 };
 
 startBtn.onclick = () => {
+
     if (!running) {
         running = true;
         step();
@@ -366,4 +419,5 @@ resetBtn.onclick = () => {
     reset();
 };
 
+// ---------------- START ----------------
 reset();
