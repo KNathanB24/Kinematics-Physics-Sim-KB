@@ -1,20 +1,11 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// ---------------- UI ----------------
+// UI
 const v0Slider = document.getElementById("v0");
 const angleSlider = document.getElementById("angle");
 const gSlider = document.getElementById("gSlider");
 const massSlider = document.getElementById("massSlider");
-
-const v0Label = document.getElementById("v0Label");
-const angleLabel = document.getElementById("angleLabel");
-const gLabel = document.getElementById("gLabel");
-const massLabel = document.getElementById("massLabel");
-
-const startBtn = document.getElementById("startBtn");
-const pauseBtn = document.getElementById("pauseBtn");
-const resetBtn = document.getElementById("resetBtn");
 
 const timeEl = document.getElementById("time");
 const heightEl = document.getElementById("height");
@@ -23,7 +14,6 @@ const rangeEl = document.getElementById("range");
 const xPosEl = document.getElementById("xPos");
 const yPosEl = document.getElementById("yPos");
 
-// ---------------- ENERGY UI ----------------
 const keValue = document.getElementById("keValue");
 const peValue = document.getElementById("peValue");
 const teValue = document.getElementById("teValue");
@@ -32,392 +22,138 @@ const keBar = document.getElementById("keBar");
 const peBar = document.getElementById("peBar");
 const teBar = document.getElementById("teBar");
 
-// ---------------- PHYSICS ----------------
+const instructions = document.getElementById("instructions");
+const header = document.getElementById("instructionsHeader");
+
+// toggle instructions
+header.onclick = () => {
+    instructions.classList.toggle("collapsed");
+};
+
+// physics
 let v0 = 80;
 let angle = 45;
 let g = 9.8;
+let mass = 1;
 let h = 0;
-let mass = 1.0;
 
-// ---------------- STATE ----------------
 let t = 0;
 let running = false;
 let points = [];
 
+let vx, vy;
+let scale = 1;
+
+let maxX = 0;
+let maxY = 0;
 let maxHeight = 0;
 let finalRange = 0;
 
-// velocity
-let vx, vy, theta;
+let initialEnergy = 1;
 
-// ---------------- AUTO SCALE ----------------
-let maxX = 0;
-let maxY = 0;
-let scale = 1;
+// setup
+function setup() {
+    let rad = angle * Math.PI / 180;
+    vx = v0 * Math.cos(rad);
+    vy = v0 * Math.sin(rad);
 
-// ---------------- TIME CONTROL ----------------
-let timeScale = 0.4;
-
-// ---------------- ENERGY ----------------
-let initialTotalEnergy = 1;
-
-// ---------------- SETUP ----------------
-function setupPhysics() {
-
-    theta = angle * Math.PI / 180;
-
-    vx = v0 * Math.cos(theta);
-    vy = v0 * Math.sin(theta);
-
-    initialTotalEnergy =
-        0.5 * mass * (vx * vx + vy * vy) + mass * g * h;
+    initialEnergy = 0.5 * mass * (vx*vx + vy*vy) + mass*g*h;
 }
 
-// ---------------- RESET ----------------
+// reset
 function reset() {
-
     t = 0;
-    points = [];
+    points = [{x:0,y:0}];
     running = false;
 
-    maxHeight = 0;
-    finalRange = 0;
+    maxX = maxY = maxHeight = finalRange = 0;
 
-    maxX = 0;
-    maxY = 0;
-
-    setupPhysics();
-
-    scale = 1;
-
-    updateEnergy(0, h);
-    updateUI(0, h);
+    setup();
     draw();
 }
 
-// ---------------- MAIN LOOP ----------------
-function step() {
+// update energy
+function energy(x,y) {
+    let vxC = vx;
+    let vyC = vy - g*t;
 
+    let ke = 0.5 * mass * (vxC*vxC + vyC*vyC);
+    let pe = mass * g * y;
+
+    keValue.textContent = ke.toFixed(1);
+    peValue.textContent = pe.toFixed(1);
+    teValue.textContent = (ke+pe).toFixed(1);
+}
+
+// step
+function step() {
     if (!running) return;
 
-    // timestep
-    let dt = 0.05 * timeScale;
-
+    let dt = 0.05;
     t += dt;
 
-    // current position
     let x = vx * t;
-    let y = h + vy * t - 0.5 * g * t * t;
+    let y = h + vy*t - 0.5*g*t*t;
 
-    // ---------------- LANDING DETECTION ----------------
     if (y < 0) {
-
-        // previous timestep
-        let t1 = t - dt;
-        let t2 = t;
-
-        let y1 = h + vy * t1 - 0.5 * g * t1 * t1;
-
-        // interpolation factor
-        let alpha = y1 / (y1 - y);
-
-        // exact impact time
-        t = t1 + alpha * (t2 - t1);
-
-        // exact impact position
-        x = vx * t;
-        y = 0;
-
         running = false;
         finalRange = x;
-
-        points.push({ x, y });
-
-        updateEnergy(x, y);
-        updateUI(x, y);
-
+        y = 0;
+        points.push({x,y});
         draw();
         return;
     }
 
-    // ---------------- DISPLAY ----------------
-    let displayY = Math.max(0, y);
+    points.push({x,y});
 
-    if (x > maxX) maxX = x;
-    if (y > maxY) maxY = y;
+    maxHeight = Math.max(maxHeight, y);
 
-    if (y > maxHeight) maxHeight = y;
-
-    let worldWidth = Math.max(maxX, 1);
-    let worldHeight = Math.max(maxY, 1);
-
-    let scaleX = canvas.width / (worldWidth * 1.2);
-    let scaleY = canvas.height / (worldHeight * 1.2);
-
-    scale = Math.min(scaleX, scaleY);
-
-    points.push({ x, y });
-
-    updateEnergy(x, y);
-    updateUI(x, displayY);
-
+    energy(x,y);
     draw();
 
     requestAnimationFrame(step);
 }
 
-// ---------------- ENERGY SYSTEM ----------------
-function updateEnergy(x, y) {
-
-    let vx_current = vx;
-    let vy_current = vy - g * t;
-
-    let speedSquared =
-        vx_current * vx_current +
-        vy_current * vy_current;
-
-    let KE = 0.5 * mass * speedSquared;
-    let PE = mass * g * y;
-    let TE = KE + PE;
-
-    keValue.textContent = KE.toFixed(1);
-    peValue.textContent = PE.toFixed(1);
-    teValue.textContent = TE.toFixed(1);
-
-    let kePercent = (KE / initialTotalEnergy) * 100;
-    let pePercent = (PE / initialTotalEnergy) * 100;
-    let tePercent = (TE / initialTotalEnergy) * 100;
-
-    keBar.style.width = Math.min(100, kePercent) + "%";
-    peBar.style.width = Math.min(100, pePercent) + "%";
-    teBar.style.width = Math.min(100, tePercent) + "%";
-}
-
-// ---------------- UI ----------------
-function updateUI(currentX = 0, currentY = 0) {
-
-    timeEl.textContent = t.toFixed(2);
-    heightEl.textContent = maxHeight.toFixed(2);
-    rangeEl.textContent = finalRange.toFixed(2);
-
-    xPosEl.textContent = currentX.toFixed(2);
-    yPosEl.textContent = Math.max(0, currentY).toFixed(2);
-
-    v0Label.textContent = v0;
-    angleLabel.textContent = angle;
-    gLabel.textContent = g.toFixed(1);
-    massLabel.textContent = mass.toFixed(1);
-}
-
-// ---------------- GRID ----------------
-function drawGrid() {
-
-    ctx.strokeStyle = "#e6e6e6";
-
-    for (let x = 0; x < canvas.width; x += 40) {
-
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
-    }
-
-    for (let y = 0; y < canvas.height; y += 40) {
-
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
-    }
-}
-
-// ---------------- AXES ----------------
-function drawAxes() {
-
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
-    ctx.fillStyle = "black";
-    ctx.font = "12px Arial";
-
-    // x-axis
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height);
-    ctx.lineTo(canvas.width, canvas.height);
-    ctx.stroke();
-
-    // y-axis
-    ctx.beginPath();
-    ctx.moveTo(0, canvas.height);
-    ctx.lineTo(0, 0);
-    ctx.stroke();
-
-    let stepMeters =
-        Math.max(5, Math.round((50 / scale) / 5) * 5);
-
-    // x ticks
-    for (let x = stepMeters; x < canvas.width / scale; x += stepMeters) {
-
-        let px = x * scale;
-
-        ctx.beginPath();
-        ctx.moveTo(px, canvas.height);
-        ctx.lineTo(px, canvas.height - 5);
-        ctx.stroke();
-
-        ctx.fillText(x.toFixed(0), px - 10, canvas.height - 10);
-    }
-
-    // y ticks
-    for (let y = stepMeters; y < canvas.height / scale; y += stepMeters) {
-
-        let py = canvas.height - y * scale;
-
-        ctx.beginPath();
-        ctx.moveTo(0, py);
-        ctx.lineTo(5, py);
-        ctx.stroke();
-
-        ctx.fillText(y.toFixed(0), 5, py + 4);
-    }
-
-    ctx.fillText("x (m)", canvas.width - 40, canvas.height - 10);
-    ctx.fillText("y (m)", 10, 15);
-}
-
-// ---------------- VELOCITY VECTOR ----------------
-function drawVelocityVector(x, y) {
-
-    let vx_current = vx;
-    let vy_current = vy - g * t;
-
-    let arrowScale = 0.5;
-
-    let dx = vx_current * arrowScale;
-    let dy = vy_current * arrowScale;
-
-    let startX = x * scale;
-    let startY = canvas.height - y * scale;
-
-    let endX = (x + dx) * scale;
-    let endY = canvas.height - (y + dy) * scale;
-
-    ctx.strokeStyle = "green";
-    ctx.lineWidth = 2;
-
-    ctx.beginPath();
-    ctx.moveTo(startX, startY);
-    ctx.lineTo(endX, endY);
-    ctx.stroke();
-
-    let arrowAngle =
-        Math.atan2(endY - startY, endX - startX);
-
-    ctx.beginPath();
-    ctx.moveTo(endX, endY);
-
-    ctx.lineTo(
-        endX - 8 * Math.cos(arrowAngle - 0.3),
-        endY - 8 * Math.sin(arrowAngle - 0.3)
-    );
-
-    ctx.lineTo(
-        endX - 8 * Math.cos(arrowAngle + 0.3),
-        endY - 8 * Math.sin(arrowAngle + 0.3)
-    );
-
-    ctx.closePath();
-
-    ctx.fillStyle = "green";
-    ctx.fill();
-}
-
-// ---------------- DRAW ----------------
+// draw
 function draw() {
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    drawGrid();
-    drawAxes();
-
-    // trajectory
-    ctx.strokeStyle = "blue";
-    ctx.lineWidth = 2;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
 
     ctx.beginPath();
+    ctx.strokeStyle = "blue";
 
-    for (let i = 0; i < points.length; i++) {
+    for (let i=0;i<points.length;i++){
+        let px = points[i].x;
+        let py = canvas.height - points[i].y;
 
-        let px = points[i].x * scale;
-        let py = canvas.height - points[i].y * scale;
-
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
+        if (i===0) ctx.moveTo(px,py);
+        else ctx.lineTo(px,py);
     }
 
     ctx.stroke();
-
-    // projectile
-    if (points.length > 0) {
-
-        let last = points[points.length - 1];
-
-        let px = last.x * scale;
-        let py = canvas.height - last.y * scale;
-
-        ctx.fillStyle = "red";
-
-        ctx.beginPath();
-        ctx.arc(px, py, 6, 0, Math.PI * 2);
-        ctx.fill();
-
-        drawVelocityVector(last.x, last.y);
-    }
 }
 
-// ---------------- CONTROLS ----------------
-v0Slider.addEventListener("input", () => {
-    v0 = Number(v0Slider.value);
-    reset();
-});
-
-angleSlider.addEventListener("input", () => {
-    angle = Number(angleSlider.value);
-    reset();
-});
-
-gSlider.addEventListener("input", () => {
-    g = Number(gSlider.value);
-    reset();
-});
-
-massSlider.addEventListener("input", () => {
-    mass = Number(massSlider.value);
-    reset();
-});
-
-window.setGravityPreset = function(value) {
-
-    g = value;
-    gSlider.value = value;
-
-    reset();
-};
-
-startBtn.onclick = () => {
-
+// controls
+document.getElementById("startBtn").onclick = () => {
     if (!running) {
         running = true;
         step();
     }
 };
 
-pauseBtn.onclick = () => {
-    running = false;
-};
+document.getElementById("pauseBtn").onclick = () => running = false;
 
-resetBtn.onclick = () => {
+document.getElementById("resetBtn").onclick = reset;
+
+v0Slider.oninput = () => { v0 = +v0Slider.value; reset(); };
+angleSlider.oninput = () => { angle = +angleSlider.value; reset(); };
+gSlider.oninput = () => { g = +gSlider.value; reset(); };
+massSlider.oninput = () => { mass = +massSlider.value; reset(); };
+
+// gravity presets
+window.setGravityPreset = (val) => {
+    g = val;
+    gSlider.value = val;
     reset();
 };
 
-// ---------------- START ----------------
 reset();
